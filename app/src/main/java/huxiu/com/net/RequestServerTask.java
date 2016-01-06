@@ -4,7 +4,12 @@ import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
+
+import huxiu.com.R;
+import huxiu.com.activities.BaseActivity;
+import huxiu.com.fragments.ProgressFragment;
+import huxiu.com.utils.Global;
+import huxiu.com.utils.Utils;
 
 /**
  * Created by yao on 15/7/23.
@@ -18,17 +23,12 @@ public abstract class RequestServerTask<T extends BaseResponse> extends AsyncTas
     BaseActivity mActivity;
     Fragment mFragment;
     ProgressFragment progressFragment;
-    View viewForSnackbar;
     String errorType;
 
     public RequestServerTask(Class<T> responseType) {
         super();
         this.responseType = responseType;
     }
-
-    /*public RequestServerTask(Class<T> responseType, Object parent, String progressTitle,String errorType) {
-        this.(Class<T> responseType,Object)
-    }*/
 
     public RequestServerTask(Class<T> responseType, Object parent, String progressTitle) {
         super();
@@ -48,11 +48,6 @@ public abstract class RequestServerTask<T extends BaseResponse> extends AsyncTas
 
     public RequestServerTask setDefaultErrMsg(int errMsg) {
         this.default_err_msg = Global.getContext().getString(errMsg);
-        return this;
-    }
-
-    public RequestServerTask setSnackbarView(View view) {
-        this.viewForSnackbar = view;
         return this;
     }
 
@@ -78,43 +73,12 @@ public abstract class RequestServerTask<T extends BaseResponse> extends AsyncTas
             } else {
                 boolean handled = onFailure(result);
                 if (!handled) {
-                    if (viewForSnackbar != null) {
-                        if (result != null && !TextUtils.isEmpty(result.msg)) {
-                            Utils.showSnackbar(viewForSnackbar, result.msg);
-                        } else if (default_err_msg != null) {
-                            Utils.showSnackbar(viewForSnackbar, default_err_msg);
-                        } else {
-                            if(mFragment!=null){
-                                if (mFragment instanceof NoticeCommentFragment || mFragment instanceof NoticeLikeFragment
-                                        || mFragment instanceof NoticeMsgFragment){
-                                    Utils.showSnackbar(viewForSnackbar, R.string.default_server_err);
-                                    //return;
-                                }
-                            }else if (mActivity != null){
-                                if (mActivity instanceof MarkActivity){
-                                    Utils.showToast(R.string.default_server_err);
-                                    mActivity.finish();
-                                }else if (mActivity instanceof PublishActivity){
-                                    Utils.showToast(R.string.default_server_err);
-                                    ((PublishActivity)mActivity).rightButton.setClickable(true);
-                                }
-                            }else {
-                                Utils.showSnackbar(viewForSnackbar, R.string.default_server_err);
-                            }
-                        }
+                    if (result != null && !TextUtils.isEmpty(result.msg)) {
+                        Utils.showToast(result.msg);
+                    } else if (default_err_msg != null) {
+                        Utils.showToast(default_err_msg);
                     } else {
-                        if (result != null && !TextUtils.isEmpty(result.msg)) {
-                            Utils.showToast(result.msg);
-                        } else if (default_err_msg != null) {
-                            Utils.showToast(default_err_msg);
-                        } else {
-                            Utils.showToast(R.string.default_server_err);
-                            if (mActivity != null){
-                                if (mActivity instanceof MarkActivity){
-                                    mActivity.finish();
-                                }
-                            }
-                        }
+                        Utils.showToast(R.string.default_server_err);
                     }
                 }
             }
@@ -131,7 +95,7 @@ public abstract class RequestServerTask<T extends BaseResponse> extends AsyncTas
         if (!TextUtils.isEmpty(progressTitle)) {
             if (mActivity != null) {
                 progressFragment = ProgressFragment.show(mActivity, progressTitle);
-            } else if (mFragment != null && !(mFragment instanceof NoticeCommentFragment) && !(mFragment instanceof NoticeLikeFragment)) {
+            } else if (mFragment != null) {
                 progressFragment = ProgressFragment.show(mFragment, progressTitle);
             }
         }

@@ -20,6 +20,12 @@ import android.view.View;
 
 import com.umeng.analytics.MobclickAgent;
 
+import applib.controller.HXSDKHelper;
+
+
+/**
+ * Activity 基类
+ */
 public class BaseActivity extends AppCompatActivity {
 
     @Override
@@ -31,8 +37,7 @@ public class BaseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // onresume时，取消notification显示
-        //HXSDKHelper.getInstance().getNotifier().reset();
-        
+        HXSDKHelper.getInstance().getNotifier().reset();
         // umeng
         MobclickAgent.onResume(this);
     }

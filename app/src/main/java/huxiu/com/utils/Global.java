@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import huxiu.com.MainApplication;
 import huxiu.com.model.User;
 
 
@@ -73,6 +74,7 @@ public class Global {
         File path = context.getExternalCacheDir();
         cacheJsonDir = new File(path, "json");
         cacheJsonDir.mkdirs();
+
         currentUser = Settings.getCurrentUser();
 
         try {
@@ -84,7 +86,7 @@ public class Global {
             e.printStackTrace();
         }
         osVersion = "Android_" + Build.VERSION.SDK_INT;
-        imei = Utils.getIMEI(NumarkApplication.getInstance());
+        imei = Utils.getIMEI(MainApplication.getInstance());
 
     }
 
@@ -103,6 +105,6 @@ public class Global {
     }
 
     public static Context getContext() {
-        return NumarkApplication.getInstance();
+        return MainApplication.getInstance();
     }
 }

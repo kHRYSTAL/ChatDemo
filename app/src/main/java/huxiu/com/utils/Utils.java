@@ -23,9 +23,6 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
-import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
-import com.tencent.mm.sdk.modelmsg.WXWebpageObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,9 +43,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import me.numark.NumarkApplication;
-import me.numark.R;
-import me.numark.view.tsnackbar.TSnackbar;
+import huxiu.com.MainApplication;
+
 
 /**
  * Created by yao on 15/7/22:下午11:49.
@@ -500,65 +496,13 @@ public class Utils {
     }
 
     public static void showToast(int resId) {
-        Toast.makeText(NumarkApplication.getInstance(), resId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainApplication.getInstance(), resId, Toast.LENGTH_SHORT).show();
     }
 
     public static void showToast(String msg) {
-        Toast.makeText(NumarkApplication.getInstance(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainApplication.getInstance(), msg, Toast.LENGTH_SHORT).show();
     }
 
-    public static void showSnackbar(View view, int resId) {
-        /*Snackbar make = Snackbar.make(view, resId, Snackbar.LENGTH_SHORT);
-        Snackbar.SnackbarLayout ve = (Snackbar.SnackbarLayout)make.getView();
-        ve.setBackgroundColor(Color.parseColor("#00b16a"));
-        ((TextView)ve.findViewById(R.id.snackbar_text)).setTextColor(Color.parseColor("#ffffff"));
-        make.show();*/
-        /*TSnackbar snackbar = TSnackbar.make(view,resId,TSnackbar.LENGTH_SHORT);
-        View snackbarView = snackbar.getView();
-        snackbarView.setBackgroundColor(Color.parseColor("#00b16a"));
-        TextView textView = (TextView) snackbarView.findViewById(R.id.snackbar_text);
-        textView.setTextColor(Color.WHITE);
-        snackbar.show();
-*/
-        /*if (Global.tSnackbar.isShown()) {
-            Global.tSnackbar.dismiss();
-        }*/
-        Global.tSnackbar.setText(view.getResources().getText(resId));
-        Global.tSnackbar.setDuration(TSnackbar.LENGTH_SHORT);
-        Global.tSnackbar.show();
-
-        Handler handler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                if (Global.tSnackbar.isShown()){
-                    Global.tSnackbar.dismiss();
-                }
-            }
-        };
-        handler.sendEmptyMessageDelayed(199,1500);
-    }
-
-    public static void showSnackbar(View view, String msg) {
-        /*Snackbar make = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT);
-        Snackbar.SnackbarLayout ve = (Snackbar.SnackbarLayout)make.getView();
-        ve.setBackgroundColor(Color.parseColor("#00b16a"));
-        ((TextView)ve.findViewById(R.id.snackbar_text)).setTextColor(Color.parseColor("#ffffff"));
-        make.show();*/
-
-        Global.tSnackbar.setText(msg);
-        Global.tSnackbar.setDuration(TSnackbar.LENGTH_SHORT);
-        Global.tSnackbar.show();
-        Handler handler = new Handler(){
-            @Override
-            public void handleMessage(Message msg) {
-                if (Global.tSnackbar.isShown()){
-                    Global.tSnackbar.dismiss();
-                }
-            }
-        };
-        handler.sendEmptyMessageDelayed(199,1500);
-
-    }
 
     public static String readStream(BufferedInputStream inputStream) throws IOException {
         try {
@@ -578,27 +522,6 @@ public class Utils {
         }
     }
 
-    /**
-     * 微信分享
-     * @param flag(0:分享到微信好友，1：分享到微信朋友圈)
-     */
-    public static void wechatShare(Context context,int flag, String url, String title, String desc, Bitmap thumb){
-        WXWebpageObject webpage = new WXWebpageObject();
-        webpage.webpageUrl = url;
-        WXMediaMessage msg = new WXMediaMessage(webpage);
-        msg.title = title;
-        msg.description = desc;
-       // msg.thumbData = Utils.bmpToByteArray(thumb, true);
-        if (thumb==null){
-            thumb = BitmapFactory.decodeResource(context.getResources(),R.drawable.share_default);
-        }
-        msg.setThumbImage(thumb);
-        SendMessageToWX.Req req = new SendMessageToWX.Req();
-        req.transaction = String.valueOf(System.currentTimeMillis());
-        req.message = msg;
-        req.scene = flag==0?SendMessageToWX.Req.WXSceneSession:SendMessageToWX.Req.WXSceneTimeline;
-        Global.mWxApi.sendReq(req);
-    }
 
     public static int getScreenWidth(Context context) {
         return context.getResources().getDisplayMetrics().widthPixels;

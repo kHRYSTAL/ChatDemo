@@ -1,11 +1,8 @@
 package huxiu.com.activities;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +10,13 @@ import android.widget.EditText;
 import java.util.HashMap;
 import java.util.Map;
 
-import huxiu.com.noomarkchatdemo.R;
+import huxiu.com.R;
+import huxiu.com.model.LogInResponse;
+import huxiu.com.net.NetworkConstants;
+import huxiu.com.net.RequestServerTask;
+import huxiu.com.utils.Global;
+import huxiu.com.utils.HttpUtil;
+import huxiu.com.utils.Settings;
 
 /**
  * 登录界面
@@ -46,7 +49,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.login_login:
-                //TODO 登录app服务器
+
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
 
@@ -61,6 +64,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+
+    /**
+     * 登录App服务器
+     * @param params post请求参数
+     */
     private void doLogInAppServer(final Map<String, Object> params) {
         new RequestServerTask<LogInResponse>(LogInResponse.class, this, getString(R.string.log_in_please_wait)) {
             @Override
@@ -71,24 +79,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             protected void onSuccess(LogInResponse result) {
                 saveUserInfo(result);
-                if (result.data.status == Constants.REGISTER_COMPLETE) {
-                    Intent intent = new Intent(LogInActivity.this, MainActivity.class);
-                    startActivity(intent);
-                }else if(result.data.status == Constants.PASSWORD_COMPLETE){
-                    Intent intent = new Intent(LogInActivity.this, ChooseInterestsActivity.class);
-                    intent.putExtra("user", Global.getGson().toJson(result.data));
-                    intent.putExtra(EXTRA_FROM_LOGIN,true);
-                    startActivity(intent);
-                }else  if (result.data.status == Constants.INTEREST_COMPLETE){
-                    Intent intent = new Intent(LogInActivity.this,AddFriendsActivity.class);
-                    intent.putExtra(EXTRA_FROM_LOGIN,true);
-                    startActivity(intent);
-                }
-
-                finish();
+                //TODO 登录环信服务器
+                //这个Demo中 环信需要的username与password为uid和明文写死的密码12345
+                //实际项目中根据需要修改密码 因为主键尽量统一 在已有用户体系下使用相同主键
+                doLoginHuanXinServer(result.data.uid,"12345");
             }
         }
                 .setDefaultErrMsg(R.string.log_in_failed)
                 .start();
+    }
+
+    /**
+     * 登录环信服务器
+     * 环信服务器登录所需参数
+     * @param uid
+     * @param password
+     */
+    private void doLoginHuanXinServer(final long uid,final String password) {
+
+    }
+
+    /**
+     * 保存用户信息至内存与SharePerference
+     * @param result 登录请求返回json对象
+     */
+    protected void saveUserInfo(LogInResponse result) {
+        Settings.saveUser(result.data);
+        Global.currentUser = result.data;
+        Settings.setCurrentUid(result.data.uid);
     }
 }
